@@ -67,7 +67,7 @@ Partial Class Form1
         'UpdateMessageTimer
         '
         Me.UpdateMessageTimer.Enabled = True
-        Me.UpdateMessageTimer.Interval = 500
+        Me.UpdateMessageTimer.Interval = 1000
         '
         'Form1
         '

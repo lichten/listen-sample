@@ -1,12 +1,12 @@
 Public Class Form1
     ''' <summary>Listenするオブジェクト</summary>
-    Private _listenObject As ListenThread = New ListenThread()
+    Private ReadOnly _listenObject As ListenThread = New ListenThread()
 
     ''' <summary>画面上に表示するログメッセージ</summary>
-    Private _recentLog As System.Text.StringBuilder = New System.Text.StringBuilder()
+    Private ReadOnly _recentLog As System.Text.StringBuilder = New System.Text.StringBuilder()
 
     ''' <summary>排他処理用のロックオブジェクト</summary>
-    Private _lockObject As Object = New Object()
+    Private ReadOnly _lockObject As Object = New Object()
 
     ''' <summary>
     ''' Listenするオブジェクトが出したメッセージを、メンバ変数に格納する。
@@ -25,26 +25,28 @@ Public Class Form1
         End SyncLock
     End Sub
 
-    Private Sub StartListenButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles StartListenButton.Click
+    Private Sub StartListenButton_Click(ByVal sender As System.Object, ByVal e As EventArgs) Handles StartListenButton.Click
         Dim post As PostLog = New PostLog(AddressOf RecvLog)
         _listenObject.Initialize(post, Integer.Parse(PortNoTextBox.Text))
+
+        _listenObject.ThreadStartEvent.WaitOne(1000)
     End Sub
 
-    Private Sub Form1_FormClosing(ByVal sender As System.Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
+    Private Sub Form1_FormClosing(ByVal sender As System.Object, ByVal e As Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
         ' Listenするオブジェクトに、処理終了するよう要求する
-        Dim stopRequest As ListenSample.ReqData = New ListenSample.ReqData
+        Dim stopRequest As ReqData = New ReqData
         stopRequest.RequestKind = RequestType.ThreadFinish
         _listenObject.AddRequest(stopRequest)
 
         ' Listenしているオブジェクトの終了処理が終わるのを待つ
-        Dim isStopped As Boolean = _listenObject.stopCompleteEvent.WaitOne(2000)
+        Dim isStopped As Boolean = _listenObject.StopCompleteEvent.WaitOne(2000)
         If isStopped = False Then
             MessageBox.Show("Listenを強制終了します")
             _listenObject.ForceStop()
         End If
     End Sub
 
-    Private Sub UpdateMessageTimer_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles UpdateMessageTimer.Tick
+    Private Sub UpdateMessageTimer_Tick(ByVal sender As System.Object, ByVal e As EventArgs) Handles UpdateMessageTimer.Tick
         ' ログの表示を更新
         SyncLock _lockObject
             LogTextBox.Text = _recentLog.ToString()

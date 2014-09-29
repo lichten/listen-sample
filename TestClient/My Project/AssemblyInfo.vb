@@ -1,6 +1,4 @@
-﻿Imports System.Resources
-
-Imports System
+﻿Imports System
 Imports System.Reflection
 Imports System.Runtime.InteropServices
 
@@ -10,18 +8,18 @@ Imports System.Runtime.InteropServices
 
 ' アセンブリ属性の値を確認します。
 
-<Assembly: AssemblyTitle("ListenSample")> 
+<Assembly: AssemblyTitle("TestClient")> 
 <Assembly: AssemblyDescription("")> 
 <Assembly: AssemblyCompany("")> 
-<Assembly: AssemblyProduct("ListenSample")> 
+<Assembly: AssemblyProduct("TestClient")> 
 <Assembly: AssemblyCopyright("Copyright (C)  2014")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: CLSCompliant(True)> 
-<Assembly: ComVisible(False)> 
+<Assembly: ComVisible(False)>
 
 'このプロジェクトが COM に公開される場合、次の GUID がタイプ ライブラリの ID になります。
-<Assembly: Guid("51c9b89b-7633-4583-a307-61ef40a543af")> 
+<Assembly: Guid("c9be374f-c1df-4db9-9065-743991df1038")> 
 
 ' アセンブリのバージョン情報は、以下の 4 つの値で構成されています:
 '
@@ -36,5 +34,3 @@ Imports System.Runtime.InteropServices
 
 <Assembly: AssemblyVersion("1.0.0.0")> 
 <Assembly: AssemblyFileVersion("1.0.0.0")> 
-
-<Assembly: NeutralResourcesLanguageAttribute("ja-JP")> 

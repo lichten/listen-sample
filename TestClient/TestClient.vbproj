@@ -5,15 +5,17 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{2B53D09F-49A7-4364-AA48-E4A1E8DDBC1E}</ProjectGuid>
+    <ProjectGuid>{FF7D2ACE-BFC8-41DF-B922-440FE9B97F02}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <StartupObject>ListenSample.My.MyApplication</StartupObject>
-    <RootNamespace>ListenSample</RootNamespace>
-    <AssemblyName>ListenSample</AssemblyName>
+    <StartupObject>TestClient.My.MyApplication</StartupObject>
+    <RootNamespace>TestClient</RootNamespace>
+    <AssemblyName>TestClient</AssemblyName>
     <MyType>WindowsForms</MyType>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>ListenSampleKey.snk</AssemblyOriginatorKeyFile>
     <OptionStrict>On</OptionStrict>
+    <TargetZone>LocalIntranet</TargetZone>
+    <GenerateManifests>false</GenerateManifests>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>TestClientKey.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,10 +23,9 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>ListenSample.xml</DocumentationFile>
+    <DocumentationFile>TestClient.xml</DocumentationFile>
     <NoWarn>
     </NoWarn>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PlatformTarget>x86</PlatformTarget>
     <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
@@ -34,10 +35,9 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>ListenSample.xml</DocumentationFile>
+    <DocumentationFile>TestClient.xml</DocumentationFile>
     <NoWarn>
     </NoWarn>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
@@ -59,6 +59,8 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClientThread.vb" />
+    <Compile Include="CommsProperty.vb" />
     <Compile Include="Form1.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -66,7 +68,6 @@
       <DependentUpon>Form1.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ListenThread.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -82,7 +83,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Utility.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Form1.resx">
@@ -97,7 +97,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ListenSampleKey.snk" />
+    <BaseApplicationManifest Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -107,6 +107,13 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="TestClientKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ListenSample\ListenSample.vbproj">
+      <Project>{2B53D09F-49A7-4364-AA48-E4A1E8DDBC1E}</Project>
+      <Name>ListenSample</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

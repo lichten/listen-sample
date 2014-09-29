@@ -42,16 +42,26 @@ Public NotInheritable Class ListenThread
     Implements IDisposable
 
     ''' <summary>スレッド開始したらシグナル状態になるイベント。スレッドの終了確認には使えません。</summary>
-    Public ReadOnly threadStartEvent As ManualResetEvent = New ManualResetEvent(False)
+    Private ReadOnly _threadStartEvent As ManualResetEvent = New ManualResetEvent(False)
+    ReadOnly Property ThreadStartEvent() As ManualResetEvent
+        Get
+            Return _threadStartEvent
+        End Get
+    End Property
 
     ''' <summary>スレッドの終了処理が終わったときシグナル状態になるイベント。ソケット接続状態の確認には使えません。</summary>
-    Public ReadOnly stopCompleteEvent As ManualResetEvent = New ManualResetEvent(False)
+    Private ReadOnly _stopCompleteEvent As ManualResetEvent = New ManualResetEvent(False)
+    ReadOnly Property StopCompleteEvent() As ManualResetEvent
+        Get
+            Return _stopCompleteEvent
+        End Get
+    End Property
 
     ''' <summary>要求を受け付けたときシグナル状態にするイベント</summary>
     Private ReadOnly _requestEvent As ManualResetEvent = New ManualResetEvent(False)
 
     ''' <summary>Dispose済みか調べる</summary>
-    Private _disposed As Boolean = False
+    Private _disposed As Boolean
 
     ''' <summary>
     ''' Dispose処理を行う。
@@ -61,8 +71,8 @@ Public NotInheritable Class ListenThread
         If Not _disposed Then
             ' マネージドリソースの解放
             If disposing Then
-                threadStartEvent.Close()
-                stopCompleteEvent.Close()
+                _threadStartEvent.Close()
+                _stopCompleteEvent.Close()
                 _requestEvent.Close()
             End If
 
@@ -118,7 +128,11 @@ Public NotInheritable Class ListenThread
     ''' <param name="portNumber">接続受付ポート番号</param>
     ''' <returns>通信スレッドが開始したらTRUE。それ以外はFALSE</returns>
     Public Function Initialize(ByVal logger As PostLog, ByVal portNumber As Integer) As Boolean
-        If threadStartEvent.WaitOne(0, True) Then
+        If logger Is Nothing Then
+            Throw New ArgumentException("loggerにNothingが指定されました。", "logger")
+        End If
+
+        If _threadStartEvent.WaitOne(0, True) Then
             _logger("Initialize 既にスレッド起動しています")
             Return False
         End If
@@ -171,7 +185,7 @@ Public NotInheritable Class ListenThread
     Private Sub ThreadLoop()
         _logger("ThreadLoop 開始")
 
-        threadStartEvent.Set()
+        _threadStartEvent.Set()
 
         ' Listen開始
         Dim listenSocket As New Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
@@ -243,7 +257,7 @@ Public NotInheritable Class ListenThread
 
                 ' Listen中のソケットが、Accept可能になった場合
                 If listenSocket.Equals(readableSocket) Then
-                    ExecuteAccept(connectingSock, readableSocket, receiveBuffer)
+                    ExecuteAccept(readableSocket, connectingSock, receiveBuffer)
                 End If
 
                 ' 接続中のソケットが、Recv可能になった場合
@@ -254,12 +268,12 @@ Public NotInheritable Class ListenThread
         Loop
 
         _logger("ThreadLoop 終了")
-        stopCompleteEvent.Set()
+        _stopCompleteEvent.Set()
         Return
 
 ErrorListen:
         _logger("ThreadLoop Listenエラー終了")
-        stopCompleteEvent.Set()
+        _stopCompleteEvent.Set()
         Return
     End Sub
 
@@ -318,7 +332,7 @@ ErrorListen:
         _logger(JpnFormat("Accept終了。 RemoteEndPoint: {0}", acceptedSock.RemoteEndPoint))
 
         ' 2回目の接続なら、前のソケットは破棄する
-        If Not connectingSock Is Nothing Then
+        If connectingSock.Connected Then
             _logger(JpnFormat("2回目の接続なので、前回の接続を破棄。 Before RemoteEndPoint: {0}", connectingSock.RemoteEndPoint))
             ' ソケットを破棄する
             receiveBuffer.Clear()
@@ -334,14 +348,14 @@ ErrorListen:
     ''' </summary>
     ''' <returns>要求を受けられる状態ならTRUE</returns>
     Private Function CheckPreconditionReqest() As Boolean
-        If threadStartEvent.WaitOne(0, True) = False Then
+        If _threadStartEvent.WaitOne(0, True) = False Then
             If Not _logger Is Nothing Then
                 _logger(JpnFormat("CheckPreconditionReqest スレッド開始していない。"))
             End If
             Return False
         End If
 
-        If stopCompleteEvent.WaitOne(0, True) Then
+        If _stopCompleteEvent.WaitOne(0, True) Then
             If Not _logger Is Nothing Then
                 _logger(JpnFormat("CheckPreconditionReqest 既にスレッド終了している。"))
             End If
@@ -351,44 +365,4 @@ ErrorListen:
         Return True
     End Function
 
-End Class
-
-''' <summary>
-''' よく使うShared関数をまとめたクラス。
-''' </summary>
-Public NotInheritable Class Utility
-    ''' <summary>
-    ''' インスタンス化して呼び出す意味が無いクラスなので、コンストラクタをPrivateで宣言。
-    ''' </summary>
-    Private Sub New()
-    End Sub
-
-    ''' <summary>
-    ''' バイト配列の内容を、16進数文字列にして返す
-    ''' </summary>
-    ''' <param name="targetData">文字列の基になるバイト配列</param>
-    ''' <returns>1バイト2文字の、16進数文字列</returns>
-    Public Shared Function HexString(ByVal targetData() As Byte, ByVal length As Integer) As String
-        Dim returnString As System.Text.StringBuilder = New System.Text.StringBuilder(2048)
-
-        For i As Integer = 0 To length - 1
-            returnString.Append(JpnFormat("{0:X2}", targetData(i)))
-
-            If ((i + 1) Mod 2) = 0 Then ' 2バイト毎にスペースを入れる
-                returnString.Append(" ")
-            End If
-        Next
-
-        Return returnString.ToString()
-    End Function
-
-    ''' <summary>
-    ''' "ja-JP"カルチャで、String.Formatを呼び出す
-    ''' </summary>
-    ''' <param name="format">String.Formatの1つ目の引数</param>
-    ''' <param name="args">String.Formatの2つ目以降の引数</param>
-    ''' <returns>String.Formatの返り値</returns>
-    Public Shared Function JpnFormat(ByVal format As String, ByVal ParamArray args() As Object) As String
-        Return String.Format(New Globalization.CultureInfo("ja-JP"), format, args)
-    End Function
 End Class

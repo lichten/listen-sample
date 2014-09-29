@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ListenSample", "ListenSample\ListenSample.vbproj", "{2B53D09F-49A7-4364-AA48-E4A1E8DDBC1E}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestClient", "TestClient\TestClient.vbproj", "{FF7D2ACE-BFC8-41DF-B922-440FE9B97F02}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{2B53D09F-49A7-4364-AA48-E4A1E8DDBC1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B53D09F-49A7-4364-AA48-E4A1E8DDBC1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B53D09F-49A7-4364-AA48-E4A1E8DDBC1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF7D2ACE-BFC8-41DF-B922-440FE9B97F02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF7D2ACE-BFC8-41DF-B922-440FE9B97F02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF7D2ACE-BFC8-41DF-B922-440FE9B97F02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF7D2ACE-BFC8-41DF-B922-440FE9B97F02}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
